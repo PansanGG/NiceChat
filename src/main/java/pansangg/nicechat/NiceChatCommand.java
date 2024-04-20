@@ -40,8 +40,9 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
                              String alias,
                              String[] args) {
         Player p = (Player) sender;
-        switch (args[0]) {
-            case ("reload"):
+
+        if (args.length > 0) {
+            if (args[0].equals("reload")) {
                 if (!p.hasPermission("nicechat.reload")) {
                     Main.me.conf.getDot("messages.missing-permissions");
                     return true;
@@ -53,8 +54,9 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
                 Config.load(Main.me.conf);
 
                 p.sendMessage("Reloaded!");
-                break;
+            }
         }
+
         return true;
     }
 }

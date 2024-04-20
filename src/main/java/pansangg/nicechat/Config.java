@@ -10,8 +10,6 @@ public class Config {
     public static boolean               UNIQUE_MESSAGES_ENABLED;
     public static Map<String, String>   UNIQUE_MESSAGES;
 
-    public static String                MESSAGE_MISSING_PERMS;
-
     public static boolean               PF_ENABLED;
     public static String                PF_REPLACING_CHAR;
     public static Pattern               PF_REGEX;
@@ -27,8 +25,6 @@ public class Config {
         UNIQUE_MESSAGES_ENABLED = (boolean) conf.getDot("unique-messages.enabled");
         UNIQUE_MESSAGES = (Map<String,String>) conf.get("unique-messages");
         UNIQUE_MESSAGES.remove("enabled");
-
-        MESSAGE_MISSING_PERMS = (String) conf.getDot("messages.missing-permissions");
 
         PF_ENABLED = (boolean) conf.getDot("profanity-filter.enabled");
         PF_REPLACING_CHAR = (String) conf.getDot("profanity-filter.replacing-char");

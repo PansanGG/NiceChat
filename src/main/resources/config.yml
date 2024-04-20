@@ -14,8 +14,6 @@ unique-messages:
   default: "{PLAYER} &r>> &7{MESSAGE}"
   vip: "{PLAYER} &r>> &#ebb609{MESSAGE}"
   admin: "👑 {PLAYER} &r>> &c{MESSAGE}"
-messages:
-  missing-permissions: "You don't have permission!"
 profanity-filter: # Filters profanity in messages (SUPPORTS ONLY RUSSIAN LANGUAGE!)
   enabled: true
   replacing-char: "#" # Character with which profanity will be replaced
