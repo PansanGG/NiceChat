@@ -27,5 +27,5 @@ profanity-filter: # Filters profanity in messages (SUPPORTS ONLY RUSSIAN LANGUAG
     cmd: "kick {PLAYER} Don't swear!" # Command that will be issued when max-count is exceeded. {PLAYER} = nickname of a player who swears too much
 
 # Thanks to:
-# - Camp3r_RU ♥
 # - MeexReay ♥
+# - Camp3r_RU ♥ (soso)
