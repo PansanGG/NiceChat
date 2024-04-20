@@ -43,11 +43,6 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
 
         if (args.length > 0) {
             if (args[0].equals("reload")) {
-                if (!p.hasPermission("nicechat.reload")) {
-                    Main.me.conf.getDot("messages.missing-permissions");
-                    return true;
-                }
-
                 p.sendMessage("Config is reloading...");
 
                 Main.me.conf.reload();
