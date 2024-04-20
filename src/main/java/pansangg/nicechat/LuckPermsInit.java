@@ -9,4 +9,6 @@ public class LuckPermsInit implements Listener {
     public LuckPermsInit(LuckPerms lp) {
         LuckPermsInit.lp = lp;
     }
+
+    // TODO: дописать
 }

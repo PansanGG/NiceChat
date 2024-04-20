@@ -11,16 +11,18 @@ import java.util.List;
 import static org.bukkit.Bukkit.getPluginManager;
 
 
-public class NiceChatCommand implements CommandExecutor, TabCompleter, Listener {
-    public static String NAME = "nicechat";
-    public JavaPlugin plugin;
+public class NiceChatCommand implements CommandExecutor, TabCompleter {
+    private String name;
+    private PluginCommand command;
 
-    public NiceChatCommand(JavaPlugin plugin) {
-        this.plugin = plugin;
-        PluginCommand cmd = plugin.getCommand(NAME);
-        cmd.setTabCompleter(this);
-        cmd.setExecutor(this);
-        getPluginManager().registerEvents(this, plugin);
+    public NiceChatCommand(String name) {
+        this.name = name;
+    }
+
+    public void register(JavaPlugin plugin) { // метод для регистрации команды LOL
+        command = plugin.getCommand(name);
+        command.setTabCompleter(this);
+        command.setExecutor(this);
     }
 
     public List<String> onTabComplete(CommandSender sender,
@@ -45,8 +47,7 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter, Listener 
                     return true;
                 }
                 p.sendMessage("Config is reloading...");
-                plugin.reloadConfig();
-                Main.me.conf = plugin.getConfig();
+                Main.me.conf.reload();
                 p.sendMessage("Reloaded!");
                 break;
         }
