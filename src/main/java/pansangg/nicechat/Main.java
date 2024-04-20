@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 
 public final class Main extends JavaPlugin implements Listener {
     public static Main me;
+    public static LuckPerms lp;
 
     public UnrealConfig conf;
     public NiceChatCommand command;
@@ -27,10 +29,12 @@ public final class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         me = this;
 
-        if (!checkPlaceholderAPI()) return;  // проверяем наличие плейсхолдер апи
-        if (!checkLuckPerms()) return;       // проверяем наличие лакпермс
+        if (!checkPlaceholderAPI()) return;
+        if (!checkLuckPerms()) return;
 
         conf = new UnrealConfig(this, "config.yml");
+
+        Config.load(conf);
 
         command = new NiceChatCommand("nicechat");
         command.register(this);
@@ -60,10 +64,9 @@ public final class Main extends JavaPlugin implements Listener {
             return false;
         } else {
             RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
-            LuckPerms api;
+
             if (provider != null) {
-                api = provider.getProvider();
-                getServer().getPluginManager().registerEvents(new LuckPermsInit(api), this);
+                lp = provider.getProvider();
                 getLogger().info("Successfully connected to LuckPerms!");
             } else {
                 getLogger().info("Can't connect to LuckPerms!");
@@ -78,64 +81,59 @@ public final class Main extends JavaPlugin implements Listener {
     public void onMessage(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String new_message;
-        if ((boolean) conf.get("chat.unique-messages.enabled")) {
-            String group;
-            String prefix;
-            String suffix;
 
-            User user = LuckPermsInit.lp.getPlayerAdapter(Player.class).getUser(e.getPlayer());
-            group = user.getPrimaryGroup();
-            prefix = user.getCachedData().getMetaData().getPrefix() == null ? "" : user.getCachedData().getMetaData().getPrefix() + " ";
-            suffix = user.getCachedData().getMetaData().getSuffix() == null ? "" : " " + user.getCachedData().getMetaData().getSuffix();
+        if (Config.UNIQUE_MESSAGES_ENABLED) {
+            User user = lp.getPlayerAdapter(Player.class).getUser(e.getPlayer());
+            String group = user.getPrimaryGroup();
+            String prefix = user.getCachedData().getMetaData().getPrefix() == null ? "" : user.getCachedData().getMetaData().getPrefix() + " ";
+            String suffix = user.getCachedData().getMetaData().getSuffix() == null ? "" : " " + user.getCachedData().getMetaData().getSuffix();
 
-            new_message = (String) conf.get("chat." + group);
+            new_message = translateHexCodes(Config.UNIQUE_MESSAGES.get(group));
             new_message = new_message.replace("{PLAYER}", prefix + p.getName() + suffix);
             new_message = new_message.replace("{MESSAGE}", filterMessage(e.getPlayer(), e.getMessage()));
-
-            e.setCancelled(true);
         } else {
-            new_message = (String) conf.get() // TODO: дописать
+            new_message = translateHexCodes(Config.DEFAULT_MESSAGE);
+            new_message = new_message.replace("{PLAYER}", p.getName());
+            new_message = new_message.replace("{MESSAGE}", filterMessage(e.getPlayer(), e.getMessage()));
         }
-        getServer().broadcastMessage(translateHexCodes(new_message));
+
+        e.setCancelled(true);
+
+        getServer().broadcastMessage(new_message);
     }
 
     public String filterMessage(Player p, String content) {
-        List<String> immunity_players = (List<String>) conf.get("options.profanity-filter.immunity-players");
-        boolean immunity = immunity_players.contains(p.getName());
-        if (immunity || !(boolean) conf.get("options.profanity-filter.enabled")) return content;
+        if (Config.PF_BYPASS_PLAYERS.contains(p.getName()) || !Config.PF_ENABLED) return content;
 
-//        List<String> profanity = List.of("сука", "пидор", "еблан", "долб", "хуй", "еба", "уёб", "уеб", "пизд", "муд", "хуё",
-//                "хуя", "манд", "бля", "ебё", "еби", "ебо", "пенис", "письк", "сись", "fuck", "dick", "penis",
-//                "ass", "suck", "shit", "bitch", "arse", "bollocks", "bugger", "cunt", "damn", "SuperSausages");
+        String output = content;
 
         int count = 0;
-        String message = PlaceholderAPI.setPlaceholders(p, content);
-//        getLogger().info("message: " + message);
-        String character = (String) conf.get("options.profanity-filter.replacing-char");
-//        getLogger().info("character: " + character);
-        message = profanityFilter(message, character);
-//        getLogger().info("final_message: " + message);
 
-        if (!(boolean) conf.get("options.profanity-filter.overdoing.enabled")) return message;
-        String cmd = (String) conf.get("options.profanity-filter.overdoing.cmd");
-        if (count > (int) conf.get("options.profanity-filter.overdoing.max-count")) {
-            getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-                getServer().dispatchCommand(getServer().getConsoleSender(), cmd.replace("{PLAYER}", p.getName()));
-            });
-        }
-        return message;
-    }
+        output = PlaceholderAPI.setPlaceholders(p, output);
 
-    public static String profanityFilter(String content, String character) {
-        Pattern pattern = Pattern.compile("(?<![а-яё])(?:(?:(?:у|[нз]а|(?:хитро|не)?вз?[ыьъ]|с[ьъ]|(?:и|ра)[зс]ъ?|(?:о[тб]|п[оа]д)[ьъ]?|(?:\\S(?=[а-яё]))+?[оаеи-])-?)?(?:[её](?:б(?!о[рй]|рач)|п[уа](?:ц|тс))|и[пб][ае][тцд][ьъ]).*?|(?:(?:н[иеа]|ра[зс]|[зд]?[ао](?:т|дн[оа])?|с(?:м[еи])?|а[пб]ч)-?)?ху(?:[яйиеёю]|л+и(?!ган)).*?|бл(?:[эя]|еа?)(?:[дт][ьъ]?)?|\\S*?(?:п(?:[иеё]зд|ид[аое]?р|ед(?:р(?!о)|[аое]р|ик)|охую)|бля(?:[дбц]|тс)|[ое]ху[яйиеё]|хуйн).*?|(?:о[тб]?|про|на|вы)?м(?:анд(?:[ауеыи](?:л(?:и[сзщ])?[ауеиы])?|ой|[ао]в.*?|юк(?:ов|[ауи])?|е[нт]ь|ища)|уд(?:[яаиое].+?|е?н(?:[ьюия]|ей))|[ао]л[ао]ф[ьъ](?:[яиюе]|[еёо]й))|елд[ауые].*?|ля[тд]ь|(?:[нз]а|по)х)(?![а-яё])");
-        Matcher matcher = pattern.matcher(content);
+        Matcher matcher = Config.PF_REGEX.matcher(output);
         StringBuilder buffer = new StringBuilder();
+
         while (matcher.find()) {
-            System.out.println(matcher.group() + " " + matcher.start() + " " + matcher.end());
-            matcher.appendReplacement(buffer, character.repeat(matcher.end() - matcher.start()));
+            matcher.appendReplacement(buffer, Config.PF_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
+            count++;
         }
-        System.out.println(buffer);
-        return buffer.toString();
+
+        if (count > 0) output = buffer.toString();
+
+        if (Config.PF_PUNISHMENT_ENABLED) {
+            if (count > Config.PF_PUNISHMENT_MAX_COUNT) {
+                new BukkitRunnable() {
+                    public void run() {
+                        getServer().dispatchCommand(
+                            getServer().getConsoleSender(),
+                            Config.PF_PUNISHMENT_COMMAND.replace("{PLAYER}", p.getName()));
+                    }
+                }.runTask(this);
+            }
+        }
+
+        return output;
     }
 
     public static String translateHexCodes(String from) {

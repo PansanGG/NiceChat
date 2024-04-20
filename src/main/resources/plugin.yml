@@ -6,6 +6,8 @@ api-version: '1.18'
 commands:
   nicechat:
     description: "Main NiceChat command"
+    permission: nicechat.command.reload
+
 permissions:
-  nicechat.reload:
+  nicechat.command.reload:
     default: op
