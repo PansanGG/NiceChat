@@ -1,0 +1,11 @@
+name: NiceChat
+version: '${project.version}'
+main: pansangg.nicechat.Main
+api-version: '1.18'
+
+commands:
+  nicechat:
+    description: "Main NiceChat command"
+permissions:
+  nicechat.reload:
+    default: op

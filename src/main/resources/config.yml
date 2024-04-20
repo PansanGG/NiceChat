@@ -1,0 +1,33 @@
+# NiceChat v1.0
+# Supports Placeholder API, Vault, HEX Color
+# Formatting is using the ampersand character (&)
+# WARNING! To plugin work correctly, do this:
+# - Placeholder API and LuckPerms are must be installed
+# - Don't use this plugin with other plugins for chat formatting
+# by PansanGG_, from Russia
+
+default-message: "{PLAYER} &r>> &7{MESSAGE}"
+unique-messages:
+  # {PLAYER} = LuckPerms prefix, nickname, and LuckPerms suffix; {MESSAGE} = message sent by player.
+  # These GROUPS ARE EXAMPLES! You need to add your groups.
+  enabled: true
+  default: "{PLAYER} &r>> &7{MESSAGE}"
+  vip: "{PLAYER} &r>> &#ebb609{MESSAGE}"
+  admin: "👑 {PLAYER} &r>> &c{MESSAGE}"
+messages:
+  missing-permissions: "You don't have permission!"
+options:
+  profanity-filter: # Filters profanity in messages (SUPPORTS ONLY RUSSIAN LANGUAGE!)
+    enabled: true
+    replacing-char: "#" # Character with which profanity will be replaced
+    immunity-players: # List of players who can swear
+      - Nickname
+      - Nickname2
+    overdoing: # Do something when some player swears too much
+      enabled: false
+      max-count: 5 # Max count of profanity words in a message
+      cmd: "kick {PLAYER} Don't swear!" # Command that will be issued when max-count is exceeded. {PLAYER} = nickname of a player who swears too much
+
+# Thanks to:
+# - Camp3r_RU ♥
+# - MeexReay ♥
