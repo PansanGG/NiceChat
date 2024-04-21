@@ -89,7 +89,7 @@ public final class Main extends JavaPlugin implements Listener {
             String suffix = user.getCachedData().getMetaData().getSuffix() == null ? "" : " " + user.getCachedData().getMetaData().getSuffix();
 
             new_message = translateHexCodes(Config.UNIQUE_MESSAGES.get(group));
-            new_message = new_message.replace("{PLAYER}", prefix + p.getName() + suffix);
+            new_message = new_message.replace("{PLAYER}", translateHexCodes(prefix + p.getName() + suffix));
             new_message = new_message.replace("{MESSAGE}", filterMessage(e.getPlayer(), e.getMessage()));
         } else {
             new_message = translateHexCodes(Config.DEFAULT_MESSAGE);
