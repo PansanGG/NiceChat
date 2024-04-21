@@ -126,8 +126,8 @@ public final class Main extends JavaPlugin implements Listener {
                 new BukkitRunnable() {
                     public void run() {
                         getServer().dispatchCommand(
-                            getServer().getConsoleSender(),
-                            Config.PF_PUNISHMENT_COMMAND.replace("{PLAYER}", p.getName()));
+                                getServer().getConsoleSender(),
+                                Config.PF_PUNISHMENT_COMMAND.replace("{PLAYER}", p.getName()));
                     }
                 }.runTask(this);
             }
