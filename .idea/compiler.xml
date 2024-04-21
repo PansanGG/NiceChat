@@ -9,5 +9,8 @@
         <module name="NiceChat" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="NiceChat" target="15" />
+    </bytecodeTargetLevel>
   </component>
 </project>
