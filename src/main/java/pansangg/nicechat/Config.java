@@ -29,7 +29,7 @@ public class Config {
         PF_ENABLED = (boolean) conf.getDot("profanity-filter.enabled");
         PF_REPLACING_CHAR = (String) conf.getDot("profanity-filter.replacing-char");
         PF_BYPASS_PLAYERS = (List<String>) conf.getDot("profanity-filter.bypass-players");
-        PF_REGEX = Pattern.compile((String) conf.getDot("profanity-filter.regex"), Pattern.CASE_INSENSITIVE+Pattern.UNICODE_CASE);
+        PF_REGEX = Pattern.compile((String) conf.getDot("profanity-filter.regex"), Pattern.CASE_INSENSITIVE);
 
         PF_PUNISHMENT_ENABLED = (boolean) conf.getDot("profanity-filter.punishment.enabled");
         PF_PUNISHMENT_MAX_COUNT = ((Number) conf.getDot("profanity-filter.punishment.max-count")).intValue();
