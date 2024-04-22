@@ -112,14 +112,11 @@ public final class Main extends JavaPlugin implements Listener {
         output = PlaceholderAPI.setPlaceholders(p, output);
 
         Matcher matcher = Config.PF_REGEX.matcher(output.toLowerCase().strip());
-        StringBuilder buffer = new StringBuilder();
 
         while (matcher.find()) {
-            matcher.appendReplacement(buffer, Config.PF_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
+            output = output.replace(matcher.group(), Config.PF_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
             count++;
         }
-
-        if (count > 0) output = buffer.toString();
 
         if (Config.PF_PUNISHMENT_ENABLED) {
             if (count > Config.PF_PUNISHMENT_MAX_COUNT) {
