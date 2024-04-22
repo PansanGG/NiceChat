@@ -112,6 +112,7 @@ public final class Main extends JavaPlugin implements Listener {
         output = PlaceholderAPI.setPlaceholders(p, output);
 
         Matcher matcher = Config.PF_REGEX.matcher(output.toLowerCase());
+
         StringBuilder buffer = new StringBuilder();
 
         while (matcher.find()) {
