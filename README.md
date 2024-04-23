@@ -34,4 +34,4 @@ Thanks to:
 
 Благодарность:
   - MeexReay
-  - Camp3r_RU
+  - Camp3r_RU (сосо)
