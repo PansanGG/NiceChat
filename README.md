@@ -1,4 +1,4 @@
-# NiceChat
+#	🇷🇺 NiceChat
 
 ## Плагин для максимальной кастомизации чата.
 
@@ -13,5 +13,25 @@
   - LuckPerms для привилегий
 
 Благодарность:
+  - MeexReay
+  - Camp3r_RU
+
+---
+
+#	🇬🇧 NiceChat
+
+## Plugin for maximum chat customization.
+
+Features:
+  - Chat formatting
+  - Profanity filter
+  - Unique messages for groups (LuckPerms)
+  - In future will be more!
+
+Supports:
+  - Placeholder API for placeholders
+  - LuckPerms for groups
+
+Thanks to:
   - MeexReay
   - Camp3r_RU
