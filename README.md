@@ -14,7 +14,6 @@ Supports:
 
 Thanks to:
   - MeexReay
-  - Camp3r_RU
 
 ---
 
@@ -34,4 +33,3 @@ Thanks to:
 
 Благодарность:
   - MeexReay
-  - Camp3r_RU (сосо)
