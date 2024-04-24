@@ -1,4 +1,4 @@
-#	 NiceChat
+#	🇬🇧 NiceChat
 
 ## Plugin for maximum chat customization.
 
@@ -18,7 +18,7 @@ Thanks to:
 
 ---
 
-#  NiceChat
+#	🇷🇺 NiceChat
 
 ## Плагин для максимальной кастомизации чата.
 
