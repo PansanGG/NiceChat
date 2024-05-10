@@ -11,3 +11,5 @@ commands:
 permissions:
   nicechat.command.reload:
     default: op
+  nicechat.chat.color:
+    default: op

@@ -7,18 +7,19 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UnrealConfig extends HashMap<String, Object> {
     private static final Yaml yaml = new Yaml();
 
-    private File file;
+    private final File file;
+
     public UnrealConfig(JavaPlugin plugin, String filename) {
-        file = Paths.get(plugin.getDataFolder().getPath(),filename).toFile();
-        if (!file.exists()) plugin.saveResource(filename,false);
+        file = Paths.get(plugin.getDataFolder().getPath(), filename).toFile();
+        if (!file.exists()) plugin.saveResource(filename, false);
         reload();
     }
+
     public void reload() {
         try {
             clear();
@@ -30,18 +31,18 @@ public class UnrealConfig extends HashMap<String, Object> {
 
     public void save() {
         try {
-            yaml.dump(this,new FileWriter(file, StandardCharsets.UTF_8));
+            yaml.dump(this, new FileWriter(file, StandardCharsets.UTF_8));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Map<String,Object> clone() {
+    public Map<String, Object> clone() {
         return new HashMap<>(this);
     }
 
     public Object getDot(String dot_key) {
-        Map<String,Object> data = clone();
+        Map<String, Object> data = clone();
 
         String[] dotted = dot_key.split("\\.");
 
@@ -61,7 +62,7 @@ public class UnrealConfig extends HashMap<String, Object> {
     }
 
     public void setDot(String dot_key, Object value) {
-        Map<String,Object> data = clone();
+        Map<String, Object> data = clone();
 
         String[] dotted = dot_key.split("\\.");
 

@@ -1,5 +1,5 @@
 name: NiceChat
-version: '1.0'
+version: '1.1'
 main: pansangg.nicechat.Main
 api-version: '1.18'
 
@@ -10,4 +10,6 @@ commands:
 
 permissions:
   nicechat.command.reload:
+    default: op
+  nicechat.chat.color:
     default: op
