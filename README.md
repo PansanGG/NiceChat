@@ -1,5 +1,8 @@
 # NiceChat
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/PansanGG/NiceChat/blob/master/README.md)
+[![ru](https://img.shields.io/badge/lang-ru-green.svg)](https://github.com/PansanGG/NiceChat/blob/master/README-RU.md)
+
 ## Plugin for maximum chat customization.
 
 Features:
