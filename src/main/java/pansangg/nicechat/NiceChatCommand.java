@@ -42,8 +42,7 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
             if (args[0].equals("reload")) {
                 p.sendMessage("Config is reloading...");
 
-                Main.me.conf.reload();
-                Config.load(Main.me.conf);
+                Main.conf.reload();
 
                 p.sendMessage("Reloaded!");
             }

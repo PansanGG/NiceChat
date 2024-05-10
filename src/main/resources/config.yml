@@ -1,31 +1,51 @@
-# NiceChat v1.0
-# Supports Placeholder API, Vault, HEX Color
-# Formatting is using the ampersand character (&)
-# WARNING! To plugin work correctly, do this:
-# - Placeholder API and LuckPerms are must be installed
-# - Don't use this plugin with other plugins for chat formatting
-# by PansanGG_, from Russia
+# NiceChat v1.0 (by PansanGG_)
+#     Supports PlaceholderAPI, Luckperms and HEX Colors
+#     Formatting is using the ampersand character (&)
+
+
+# Permissions
+#     nicechat.command.nicechat - Access to use /nicechat command
+#     nicechat.chat.color       - Access to use chat colors in messages
+
+
+# Default message format
+#     It is used in all messages not modified via unique-messages
+#     {PLAYER} is changed to the name of the message author and {MESSAGE} is changed to the text of the message
+#     All placeholders from PlaceholderAPI also work
 
 default-message: "{PLAYER} &r>> &7{MESSAGE}"
+
+
+# Unique messages
+#     Unique message formats for each benefit
+#     {PLAYER} also contains the privilege prefix and suffix
+#     This feature also requires LuckPerms
+
 unique-messages:
-  # {PLAYER} = LuckPerms prefix, nickname, and LuckPerms suffix; {MESSAGE} = message sent by player.
-  # These GROUPS ARE EXAMPLES! You need to add your groups.
-  enabled: true
-  default: "{PLAYER} &r>> &7{MESSAGE}"
+  enabled: true                          # Is this feature enabled?
+  default: "{PLAYER} &r>> &7{MESSAGE}"   # This is just example groups
   vip: "{PLAYER} &r>> &#ebb609{MESSAGE}"
   admin: "👑 {PLAYER} &r>> &c{MESSAGE}"
-profanity-filter: # Filters profanity in messages (SUPPORTS ONLY RUSSIAN LANGUAGE!)
-  enabled: true
-  replacing-char: "#" # Character with which profanity will be replaced
-  bypass-players: # List of players who can swear
+
+
+# Profanity filter
+#     Swear filter, replaces swear words with any symbol (default #)
+#     There is a penalty for using swear words above a certain threshold
+#     Defines obscene words through regexes located in regex.txt
+
+profanity-filter:
+  enabled: true           # Do I need to filter profanity in messages?
+  replacing-char: "#"     # Symbol with which profanity will be replaced (fuck -> ####)
+  bypass-players:         # List of players who can bypass this filter
     - Nickname
     - Nickname2
-  regex: "(?<![а-яё])(?:(?:(?:у|[нз]а|(?:хитро|не)?вз?[ыьъ]|с[ьъ]|(?:и|ра)[зс]ъ?|(?:о[тб]|п[оа]д)[ьъ]?|(?:\\S(?=[а-яё]))+?[оаеи-])-?)?(?:[её](?:б(?!о[рй]|рач)|п[уа](?:ц|тс))|и[пб][ае][тцд][ьъ]).*?|(?:(?:н[иеа]|ра[зс]|[зд]?[ао](?:т|дн[оа])?|с(?:м[еи])?|а[пб]ч)-?)?ху(?:[яйиеёю]|л+и(?!ган)).*?|бл(?:[эя]|еа?)(?:[дт][ьъ]?)?|\\S*?(?:п(?:[иеё]зд|ид[аое]?р|ед(?:р(?!о)|[аое]р|ик)|охую)|бля(?:[дбц]|тс)|[ое]ху[яйиеё]|хуйн).*?|(?:о[тб]?|про|на|вы)?м(?:анд(?:[ауеыи](?:л(?:и[сзщ])?[ауеиы])?|ой|[ао]в.*?|юк(?:ов|[ауи])?|е[нт]ь|ища)|уд(?:[яаиое].+?|е?н(?:[ьюия]|ей))|[ао]л[ао]ф[ьъ](?:[яиюе]|[еёо]й))|елд[ауые].*?|ля[тд]ь|(?:[нз]а|по)х)(?![а-яё])"
-  punishment: # Do something when some player swears too much
-    enabled: false
-    max-count: 5 # Max count of profanity words in a message
-    cmd: "kick {PLAYER} Don't swear!" # Command that will be issued when max-count is exceeded. {PLAYER} = nickname of a player who swears too much
 
-# Thanks to:
-# - MeexReay ♥
-# - Camp3r_RU ♥ (soso)
+
+  # Punishment
+  #     Execute command when some player swears too much
+  #     Only one type of punishment, will be corrected in the future
+
+  punishment:
+    enabled: false                    # Do I need to punish players for swear?
+    max-count: 5                      # Max count of profanity words in a message
+    cmd: "kick {PLAYER} Don't swear!" # Command that will be issued when max-count is exceeded.

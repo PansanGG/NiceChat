@@ -19,11 +19,11 @@ import java.util.regex.Pattern;
 public final class Main extends JavaPlugin implements Listener {
     public static Main me;
     public static LuckPerms lp;
+    public static Config conf;
 
     public static boolean has_placeholder_api;
     public static boolean has_luckperms;
 
-    public UnrealConfig conf;
     public NiceChatCommand command;
 
     public static String translateHexCodes(String from) {
@@ -49,19 +49,17 @@ public final class Main extends JavaPlugin implements Listener {
         has_placeholder_api = checkPlaceholderAPI();
         has_luckperms = checkLuckPerms();
 
-        conf = new UnrealConfig(this, "config.yml");
-
-        Config.load(conf);
-
         command = new NiceChatCommand("nicechat");
         command.register(this);
+
+        conf = new Config(this);
 
         getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-        // The most empty place...
+        // Pep soso etity kolot .,/
     }
 
     public boolean checkPlaceholderAPI() {
@@ -95,17 +93,17 @@ public final class Main extends JavaPlugin implements Listener {
         Player p = e.getPlayer();
         String new_message;
 
-        if (Config.UNIQUE_MESSAGES_ENABLED && has_luckperms) {
+        if (conf.UNIQUE_MESSAGES_ENABLED && has_luckperms) {
             User user = lp.getPlayerAdapter(Player.class).getUser(e.getPlayer());
             String group = user.getPrimaryGroup();
             String prefix = user.getCachedData().getMetaData().getPrefix() == null ? "" : user.getCachedData().getMetaData().getPrefix() + " ";
             String suffix = user.getCachedData().getMetaData().getSuffix() == null ? "" : " " + user.getCachedData().getMetaData().getSuffix();
 
-            new_message = translateHexCodes(Config.UNIQUE_MESSAGES.get(group));
+            new_message = translateHexCodes(conf.UNIQUE_MESSAGES.get(group));
             new_message = new_message.replace("{PLAYER}", translateHexCodes(prefix + p.getName() + suffix));
             new_message = new_message.replace("{MESSAGE}", p.hasPermission("nicechat.chat.color") ? translateHexCodes(filterMessage(e.getPlayer(), e.getMessage())) : filterMessage(e.getPlayer(), e.getMessage()));
         } else {
-            new_message = translateHexCodes(Config.DEFAULT_MESSAGE);
+            new_message = translateHexCodes(conf.DEFAULT_MESSAGE);
             new_message = new_message.replace("{PLAYER}", p.getName());
             new_message = new_message.replace("{MESSAGE}", filterMessage(e.getPlayer(), e.getMessage()));
         }
@@ -121,7 +119,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     public String filterMessage(Player p, String content) {
         // profanity filter
-        if (Config.PF_BYPASS_PLAYERS.contains(p.getName()) || !Config.PF_ENABLED) return content;
+        if (conf.PF_BYPASS_PLAYERS.contains(p.getName()) || !conf.PF_ENABLED) return content;
 
         String output = content;
 
@@ -129,20 +127,22 @@ public final class Main extends JavaPlugin implements Listener {
 
         output = setPlaceholders(p, output);
 
-        Matcher matcher = Config.PF_REGEX.matcher(output.toLowerCase().strip());
+        for (Pattern pattern : conf.PF_REGEX) {
+            Matcher matcher = pattern.matcher(output.toLowerCase().trim());
 
-        while (matcher.find()) {
-            output = output.replace(matcher.group(), Config.PF_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
-            count++;
+            while (matcher.find()) {
+                output = output.replace(matcher.group(), conf.PF_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
+                count++;
+            }
         }
 
-        if (Config.PF_PUNISHMENT_ENABLED) {
-            if (count > Config.PF_PUNISHMENT_MAX_COUNT) {
+        if (conf.PF_PUNISHMENT_ENABLED) {
+            if (count > conf.PF_PUNISHMENT_MAX_COUNT) {
                 new BukkitRunnable() {
                     public void run() {
                         getServer().dispatchCommand(
                                 getServer().getConsoleSender(),
-                                Config.PF_PUNISHMENT_COMMAND.replace("{PLAYER}", p.getName()));
+                                conf.PF_PUNISHMENT_COMMAND.replace("{PLAYER}", p.getName()));
                     }
                 }.runTask(this);
             }

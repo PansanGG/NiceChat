@@ -6,6 +6,6 @@ rm -r "target"
 if [ -z $1 ]; then
   exit 0
 elif [ "$1" == "test" ]; then
-  cp "target/NiceChat-*" "/home/user/Desktop/servertest/plugins/nicechat.jar"
+  cp target/NiceChat-* "/home/user/Desktop/servertest/plugins/nicechat.jar"
   exit 0
 fi
