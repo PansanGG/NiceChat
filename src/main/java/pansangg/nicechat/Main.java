@@ -20,6 +20,9 @@ public final class Main extends JavaPlugin implements Listener {
     public static Main me;
     public static LuckPerms lp;
 
+    public static boolean has_placeholder_api;
+    public static boolean has_luckperms;
+
     public UnrealConfig conf;
     public NiceChatCommand command;
 
@@ -43,8 +46,8 @@ public final class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         me = this;
 
-        if (!checkPlaceholderAPI()) return;
-        if (!checkLuckPerms()) return;
+        has_placeholder_api = checkPlaceholderAPI();
+        has_luckperms = checkLuckPerms();
 
         conf = new UnrealConfig(this, "config.yml");
 
@@ -63,8 +66,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     public boolean checkPlaceholderAPI() {
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            getLogger().info("PlaceholderAPI not found! Disabling plugin...");
-            getServer().getPluginManager().disablePlugin(me);
+            getLogger().info("PlaceholderAPI not found!");
             return false;
         }
         return true;
@@ -73,8 +75,6 @@ public final class Main extends JavaPlugin implements Listener {
     public boolean checkLuckPerms() {
         if (getServer().getPluginManager().getPlugin("LuckPerms") == null) {
             getLogger().info("LuckPerms not found!");
-            getLogger().info("Disabling plugin...");
-            getServer().getPluginManager().disablePlugin(me);
             return false;
         } else {
             RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
@@ -84,7 +84,6 @@ public final class Main extends JavaPlugin implements Listener {
                 getLogger().info("Successfully connected to LuckPerms!");
             } else {
                 getLogger().info("Can't connect to LuckPerms!");
-                getLogger().info("Disabling plugin...");
                 return false;
             }
         }
@@ -96,7 +95,7 @@ public final class Main extends JavaPlugin implements Listener {
         Player p = e.getPlayer();
         String new_message;
 
-        if (Config.UNIQUE_MESSAGES_ENABLED) {
+        if (Config.UNIQUE_MESSAGES_ENABLED && has_luckperms) {
             User user = lp.getPlayerAdapter(Player.class).getUser(e.getPlayer());
             String group = user.getPrimaryGroup();
             String prefix = user.getCachedData().getMetaData().getPrefix() == null ? "" : user.getCachedData().getMetaData().getPrefix() + " ";
@@ -116,6 +115,10 @@ public final class Main extends JavaPlugin implements Listener {
         getServer().broadcastMessage(new_message);
     }
 
+    public static String setPlaceholders(Player player, String text) {
+        return has_placeholder_api ? PlaceholderAPI.setPlaceholders(player, text) : text;
+    }
+
     public String filterMessage(Player p, String content) {
         // profanity filter
         if (Config.PF_BYPASS_PLAYERS.contains(p.getName()) || !Config.PF_ENABLED) return content;
@@ -124,7 +127,7 @@ public final class Main extends JavaPlugin implements Listener {
 
         int count = 0;
 
-        output = PlaceholderAPI.setPlaceholders(p, output);
+        output = setPlaceholders(p, output);
 
         Matcher matcher = Config.PF_REGEX.matcher(output.toLowerCase().strip());
 
