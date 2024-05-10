@@ -1,4 +1,4 @@
-#	🇬🇧 NiceChat
+# NiceChat
 
 ## Plugin for maximum chat customization.
 
@@ -14,24 +14,4 @@ Requires:
   (without these plugins NiceChat won't enable)
 
 Thanks to:
-  - MeexReay
-
----
-
-#	🇷🇺 NiceChat
-
-## Плагин для максимальной кастомизации чата.
-
-Фичи:
-  - Форматирование чата
-  - Фильтр нецензурной лексики
-  - Уникальные сообщения для разных привилегий (LuckPerms)
-  - В будущем будет ещё больше!
-
-Необходимые плагины:
-  - Placeholder API для плейсхолдеров
-  - LuckPerms для привилегий
-  (без этих плагинов NiceChat не запустится)
-
-Благодарность:
   - MeexReay
