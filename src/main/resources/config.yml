@@ -1,11 +1,17 @@
 # NiceChat v1.0 (by PansanGG_)
 #     Supports PlaceholderAPI, Luckperms and HEX Colors
 #     Formatting is using the ampersand character (&)
+#     WARNING! This plugin requires ProtocolLib
 
 
 # Permissions
 #     nicechat.command.nicechat - Access to use /nicechat command
+#     nicechat.command.reload   - Access to use /nicechat reload command
 #     nicechat.chat.color       - Access to use chat colors in messages
+#     nicechat.chat.delete      - Access to delete your own messages
+#     nicechat.chat.edit        - Access to edit your own messages
+#     nicechat.chat.delete_all  - Access to delete all messages
+#     nicechat.chat.edit_all    - Access to edit all messages
 
 
 # Default message format
@@ -13,7 +19,7 @@
 #     {PLAYER} is changed to the name of the message author and {MESSAGE} is changed to the text of the message
 #     All placeholders from PlaceholderAPI also work
 
-default-message: "{PLAYER} &r>> &7{MESSAGE}"
+default-message: "{DELETE}{EDIT}{PLAYER} &r>> &7{MESSAGE}"
 
 
 # Unique messages
@@ -23,10 +29,22 @@ default-message: "{PLAYER} &r>> &7{MESSAGE}"
 
 unique-messages:
   enabled: true                          # Is this feature enabled?
-  default: "{PLAYER} &r>> &7{MESSAGE}"   # This is just example groups
-  vip: "{PLAYER} &r>> &#ebb609{MESSAGE}"
-  admin: "👑 {PLAYER} &r>> &c{MESSAGE}"
+  default: "{DELETE}{EDIT}{PLAYER} &r>> &7{MESSAGE}"   # This is just example groups
+  vip: "{DELETE}{EDIT}{PLAYER} &r>> &#ebb609{MESSAGE}"
+  admin: "{DELETE}{EDIT}{PLAYER} &r>> &c{MESSAGE}"
 
+
+# Action buttons
+#     Adds delete and edit buttons to messages
+#     You need to write {DELETE} and {EDIT} in formats where you need this buttons
+
+action-buttons:
+  enabled: true                  # Do you really need this buttons?
+  delete-button: "&c[&4🗑&c]&r "  # Delete button
+  edit-button: "&e[&6📝&e]&r "    # Edit button
+  delete-button-hidden: "    "   # Delete button when player isn't accessed to delete message
+  edit-button-hidden: "    "     # Edit button when player isn't accessed to edit message
+  messages-cache: 500            # Message buffer size
 
 # Profanity filter
 #     Swear filter, replaces swear words with any symbol (default #)
@@ -49,3 +67,15 @@ profanity-filter:
     enabled: false                    # Do I need to punish players for swear?
     max-count: 5                      # Max count of profanity words in a message
     cmd: "kick {PLAYER} Don't swear!" # Command that will be issued when max-count is exceeded.
+
+
+# Messages
+#     The text of all messages and plugin hints that players can see
+
+messages:
+  delete-hint: "Delete this message"
+  edit-hint: "Edit this message"
+  delete-finished: "Message deleted!"
+  edit-finished: "Message edited!"
+  reload: "Reloading..."
+  reload-finished: "Reload finished"

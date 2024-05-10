@@ -2,6 +2,7 @@ name: NiceChat
 version: '${project.version}'
 main: pansangg.nicechat.Main
 api-version: '1.18'
+depend: [ ProtocolLib ]
 
 commands:
   nicechat:
@@ -10,6 +11,16 @@ commands:
 
 permissions:
   nicechat.command.nicechat:
+    default: true
+  nicechat.command.reload:
     default: op
   nicechat.chat.color:
+    default: op
+  nicechat.chat.delete:
+    default: true
+  nicechat.chat.edit:
+    default: true
+  nicechat.chat.delete_all:
+    default: op
+  nicechat.chat.edit_all:
     default: op
