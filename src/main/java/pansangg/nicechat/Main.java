@@ -77,23 +77,29 @@ public final class Main extends JavaPlugin implements Listener {
 
                 Player player = event.getPlayer();
 
-                String content = (String) event.getPacket().getModifier().readSafely(0);
+                Object cont = event.getPacket().getModifier().readSafely(0);
                 boolean overlay = (boolean) event.getPacket().getModifier().readSafely(1);
 
                 if (!overlay) {
-                    if (content.length() > 16) {
-                        String secret = content.substring(0, 16);
-                        String json = content.substring(16);
-
-                        if (my_secrets.contains(secret)) {
-                            event.getPacket().getModifier().write(0, json);
-                            my_secrets.remove(secret);
-                            return;
+                    if (cont instanceof TextComponent comp) {
+                        if (conf.AB_ENABLED) {
+                            addMessage(player, new SystemMessage(comp));
                         }
-                    }
+                    } else if (cont instanceof String content) {
+                        if (content.length() > 16) {
+                            String secret = content.substring(0, 16);
+                            String json = content.substring(16);
 
-                    if (conf.AB_ENABLED) {
-                        addMessage(player, new SystemMessage(JSONComponentSerializer.json().deserialize(content)));
+                            if (my_secrets.contains(secret)) {
+                                event.getPacket().getModifier().write(0, json);
+                                my_secrets.remove(secret);
+                                return;
+                            }
+                        }
+
+                        if (conf.AB_ENABLED) {
+                            addMessage(player, new SystemMessage(JSONComponentSerializer.json().deserialize(content)));
+                        }
                     }
                 }
             }
