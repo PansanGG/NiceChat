@@ -34,14 +34,20 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
                 completes.add("reload");
             }
 
-            if (sender.hasPermission("nicechat.chat.delete") ||
-                    sender.hasPermission("nicechat.chat.delete_all")) {
-                completes.add("delete");
+            if (Main.conf.AB_ENABLED) {
+                if (sender.hasPermission("nicechat.chat.delete") ||
+                        sender.hasPermission("nicechat.chat.delete_all")) {
+                    completes.add("delete");
+                }
+
+                if (sender.hasPermission("nicechat.chat.edit") ||
+                        sender.hasPermission("nicechat.chat.edit_all")) {
+                    completes.add("edit");
+                }
             }
 
-            if (sender.hasPermission("nicechat.chat.edit") ||
-                    sender.hasPermission("nicechat.chat.edit_all")) {
-                completes.add("edit");
+            if (Main.conf.SP_ENABLED) {
+                completes.add("spoiler");
             }
         }
 
@@ -59,31 +65,46 @@ public class NiceChatCommand implements CommandExecutor, TabCompleter {
                 Main.me.sendSystemMessage(p, Main.conf.MSG_RELOAD);
                 Main.conf.reload();
                 Main.me.sendSystemMessage(p, Main.conf.MSG_RELOAD_FINISHED);
-            } else if (args[0].equals("delete")) {
-                if (args.length >= 2) {
-                    String id = args[1];
-                    ChatMessage message = Main.me.getMessage(id);
+            }
 
-                    if (message != null &&
-                            sender.hasPermission("nicechat.chat.delete_all") ||
-                            (sender.hasPermission("nicechat.chat.delete") && message.getAuthor().equals(p))) {
-                        Main.me.removeMessage(message);
-                        Main.me.updateMessages();
-                        Main.me.sendSystemMessage(p, Main.conf.MSG_DELETE_FINISHED, 60);
+            if (Main.conf.AB_ENABLED) {
+                if (args[0].equals("delete")) {
+                    if (args.length >= 2) {
+                        String id = args[1];
+                        ChatMessage message = Main.me.getMessage(id, p);
+
+                        if (message != null &&
+                                sender.hasPermission("nicechat.chat.delete_all") ||
+                                (sender.hasPermission("nicechat.chat.delete") && message.getAuthor().equals(p))) {
+                            Main.me.removeMessage(id);
+                            Main.me.updateMessages();
+                            Main.me.sendSystemMessage(p, Main.conf.MSG_DELETE_FINISHED, 60);
+                        }
                     }
-                }
-            } else if (args[0].equals("edit")) {
-                if (args.length >= 3) {
-                    String id = args[1];
-                    String text = String.join(" ", List.of(args).subList(2, args.length));
-                    ChatMessage message = Main.me.getMessage(id);
+                } else if (args[0].equals("edit")) {
+                    if (args.length >= 3) {
+                        String id = args[1];
+                        String text = String.join(" ", List.of(args).subList(2, args.length));
+                        ChatMessage message = Main.me.getMessage(id, p);
 
-                    if (message != null &&
-                            sender.hasPermission("nicechat.chat.edit_all") ||
-                            (sender.hasPermission("nicechat.chat.edit") && message.getAuthor().equals(p))) {
-                        message.setText(text);
-                        Main.me.updateMessages();
-                        Main.me.sendSystemMessage(p, Main.conf.MSG_EDIT_FINISHED, 60);
+                        if (message != null &&
+                                sender.hasPermission("nicechat.chat.edit_all") ||
+                                (sender.hasPermission("nicechat.chat.edit") && message.getAuthor().equals(p))) {
+                            if (Main.me.editMessage(id, text)) {
+                                Main.me.updateMessages();
+                                Main.me.sendSystemMessage(p, Main.conf.MSG_EDIT_FINISHED, 60);
+                            }
+                        }
+                    }
+                } else if (args[0].equals("spoiler")) {
+                    if (args.length >= 2) {
+                        String id = args[1];
+                        ChatMessage message = Main.me.getMessage(id, p);
+
+                        if (message != null) {
+                            message.setText(message.getOriginalText());
+                            Main.me.updateMessages(p);
+                        }
                     }
                 }
             }

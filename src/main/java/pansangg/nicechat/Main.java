@@ -44,7 +44,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     public NiceChatCommand command;
 
-    public LinkedList<Message> chat_messages;
+    public HashMap<Player, LinkedList<Message>> chat_messages;
 
     public List<String> my_secrets;
 
@@ -60,7 +60,7 @@ public final class Main extends JavaPlugin implements Listener {
 
         conf = new Config(this);
 
-        chat_messages = new LinkedList<>();
+        chat_messages = new HashMap<>();
 
         my_secrets = new ArrayList<>();
 
@@ -74,25 +74,25 @@ public final class Main extends JavaPlugin implements Listener {
             public void onPacketSending(PacketEvent event) {
                 if (!event.getPacketType().equals(PacketType.Play.Server.SYSTEM_CHAT)) return;
 
-                if (conf.AB_ENABLED) {
-                    Player player = event.getPlayer();
+                Player player = event.getPlayer();
 
-                    String content = (String) event.getPacket().getModifier().readSafely(0);
-                    boolean overlay = (boolean) event.getPacket().getModifier().readSafely(1);
+                String content = (String) event.getPacket().getModifier().readSafely(0);
+                boolean overlay = (boolean) event.getPacket().getModifier().readSafely(1);
 
-                    if (!overlay) {
-                        if (content.length() > 16) {
-                            String secret = content.substring(0, 16);
-                            String json = content.substring(16);
+                if (!overlay) {
+                    if (content.length() > 16) {
+                        String secret = content.substring(0, 16);
+                        String json = content.substring(16);
 
-                            if (my_secrets.contains(secret)) {
-                                event.getPacket().getModifier().write(0, json);
-                                my_secrets.remove(secret);
-                                return;
-                            }
+                        if (my_secrets.contains(secret)) {
+                            event.getPacket().getModifier().write(0, json);
+                            my_secrets.remove(secret);
+                            return;
                         }
+                    }
 
-                        chat_messages.add(new SystemMessage(JSONComponentSerializer.json().deserialize(content), player));
+                    if (conf.AB_ENABLED) {
+                        addMessage(player, new SystemMessage(JSONComponentSerializer.json().deserialize(content)));
                     }
                 }
             }
@@ -106,15 +106,27 @@ public final class Main extends JavaPlugin implements Listener {
         // Pep soso etity kolot .,/
     }
 
+    public void addMessage(Player player, Message message) {
+        if (!chat_messages.containsKey(player))
+            chat_messages.put(player, new LinkedList<>());
+        chat_messages.get(player).add(message);
+    }
+
+    public void addMessageAll(Message message) {
+        for (Player player : getServer().getOnlinePlayers()) {
+            addMessage(player, message.clone());
+        }
+    }
+
     public SystemMessage sendSystemMessage(Player player, TextComponent text, int delay) {
-        SystemMessage message = new SystemMessage(text, player);
-        chat_messages.add(message);
+        SystemMessage message = new SystemMessage(text);
+        addMessage(player, message);
 
         sendMessage(player, text);
 
         new BukkitRunnable() {
             public void run() {
-                removeMessage(message);
+                removeMessage(player, message);
                 updateMessages(player);
             }
         }.runTaskLater(this, delay);
@@ -123,8 +135,8 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     public SystemMessage sendSystemMessage(Player player, TextComponent text) {
-        SystemMessage message = new SystemMessage(text, player);
-        chat_messages.add(message);
+        SystemMessage message = new SystemMessage(text);
+        addMessage(player, message);
 
         sendMessage(player, text);
 
@@ -197,35 +209,45 @@ public final class Main extends JavaPlugin implements Listener {
         proto.sendServerPacket(player, packet);
     }
 
+    private String replaceSpoilers(String text) {
+        String output = text;
+        Matcher matcher = conf.SP_REGEX.matcher(text);
+
+        while (matcher.find()) {
+            output = output.replace(matcher.group(), conf.SP_REPLACING_CHAR.repeat(matcher.end() - matcher.start()));
+        }
+
+        return output;
+    }
+
     private ChatMessage addMessage(Player player, String text) {
-        ChatMessage message = new ChatMessage(getId(), player, text);
+        ChatMessage message = new ChatMessage(getId(), player, replaceSpoilers(text), text);
 
         if (conf.AB_ENABLED) {
-            chat_messages.add(message);
-
-            if (chat_messages.size() > conf.AB_MESSAGES_CACHE) {// TODO: config changing this num
-                chat_messages = (LinkedList<Message>) chat_messages.subList(chat_messages.size() - conf.AB_MESSAGES_CACHE, chat_messages.size());
-                chat_messages.sort(Comparator.comparing(Message::getCreatedDate));
-            }
+            addMessageAll(message);
         }
 
         return message;
     }
 
     public TextComponent replaceButtons(Player viewer, ChatMessage message, TextComponent text) {
-        return (TextComponent) text
-                .replaceText((b) -> b.matchLiteral("{DELETE}").replacement(
-                        viewer.hasPermission("nicechat.chat.delete_all") ||
-                        (viewer.hasPermission("nicechat.chat.delete") && message.getAuthor().equals(viewer)) ? conf.AB_DELETE_BUTTON
-                            .hoverEvent(HoverEvent.showText(conf.MSG_DELETE_HINT))
-                            .clickEvent(ClickEvent.runCommand("/nicechat delete "+message.getId())) : Component.empty()
-                ))
-                .replaceText((b) -> b.matchLiteral("{EDIT}").replacement(
-                        viewer.hasPermission("nicechat.chat.edit_all") ||
-                        (viewer.hasPermission("nicechat.chat.edit") && message.getAuthor().equals(viewer)) ? conf.AB_EDIT_BUTTON
-                            .hoverEvent(HoverEvent.showText(conf.MSG_EDIT_HINT))
-                            .clickEvent(ClickEvent.suggestCommand("/nicechat edit "+message.getId()+" ")) : Component.empty()
-                ));
+        if (Main.conf.AB_ENABLED) {
+            return (TextComponent) text
+                    .replaceText((b) -> b.matchLiteral("{DELETE}").replacement(
+                            viewer.hasPermission("nicechat.chat.delete_all") ||
+                                    (viewer.hasPermission("nicechat.chat.delete") && message.getAuthor().equals(viewer)) ? conf.AB_DELETE_BUTTON
+                                    .hoverEvent(HoverEvent.showText(conf.MSG_DELETE_HINT))
+                                    .clickEvent(ClickEvent.runCommand("/nicechat delete " + message.getId())) : Component.empty()
+                    ))
+                    .replaceText((b) -> b.matchLiteral("{EDIT}").replacement(
+                            viewer.hasPermission("nicechat.chat.edit_all") ||
+                                    (viewer.hasPermission("nicechat.chat.edit") && message.getAuthor().equals(viewer)) ? conf.AB_EDIT_BUTTON
+                                    .hoverEvent(HoverEvent.showText(conf.MSG_EDIT_HINT))
+                                    .clickEvent(ClickEvent.suggestCommand("/nicechat edit " + message.getId() + " ")) : Component.empty()
+                    ));
+        } else {
+            return text;
+        }
     }
 
     public void clearMessages() {
@@ -234,36 +256,82 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     public void updateMessages() {
-        chat_messages.sort(Comparator.comparing(Message::getCreatedDate));
-
         for (Player player : getServer().getOnlinePlayers()) {
             updateMessages(player);
         }
     }
 
-    public ChatMessage getMessage(String id) {
-        for (Message msg : chat_messages)
-            if (msg instanceof ChatMessage chat && chat.getId().equals(id))
-                return chat;
-        return null;
+    public boolean editMessage(String id, String text) {
+        boolean found = false;
+        for (LinkedList<Message> msgs : chat_messages.values()) {
+            for (Message msg : msgs) {
+                if (msg instanceof ChatMessage ch) {
+                    if (ch.getId().equals(id)) {
+                        ch.setText(text);
+                        found = true;
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     public void updateMessages(Player player) {
         TextComponent text = clearChat;
 
-        for (Message msg : chat_messages) {
-            if (msg instanceof ChatMessage || (
-                    msg instanceof SystemMessage sys &&
-                    sys.getReceiver().equals(player))) {
-                text = text.append(Component.newline().append(msg.sendMessage(player)));
-            }
+        for (Message msg : chat_messages.getOrDefault(player, new LinkedList<>())) {
+            text = text.append(Component.newline().append(msg.sendMessage(player)));
         }
 
         sendMessage(player, text);
     }
 
-    public void removeMessage(Message msg) {
-        chat_messages.removeIf((o) -> o.equals(msg));
+    public ChatMessage getMessage(String id, Player player) {
+        for (Message msg : chat_messages.get(player)) {
+            if (msg instanceof ChatMessage ch) {
+                if (ch.getId().equals(id)) {
+                    return ch;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ChatMessage getMessage(String id) {
+        for (LinkedList<Message> msgs : chat_messages.values()) {
+            for (Message msg : msgs) {
+                if (msg instanceof ChatMessage ch) {
+                    if (ch.getId().equals(id)) {
+                        return ch;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void removeMessage(Player player, Message message) {
+        chat_messages.get(player).remove(message);
+    }
+
+    public void removeMessage(String id) {
+        for (LinkedList<Message> msgs : chat_messages.values()) {
+            msgs.removeIf((o) -> o instanceof ChatMessage ch && ch.getId().equals(id));
+        }
+    }
+
+    public boolean hasMessage(String id) {
+        boolean found = false;
+        for (LinkedList<Message> msgs : chat_messages.values()) {
+            for (Message msg : msgs) {
+                if (msg instanceof ChatMessage ch) {
+                    if (ch.getId().equals(id)) {
+                        found = true;
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     public String getId() {
@@ -271,7 +339,7 @@ public final class Main extends JavaPlugin implements Listener {
 
         do {
             id = randomString(5, "qwertyuiopasdfghjklzxcvbnm".toCharArray());
-        } while (getMessage(id) != null);
+        } while (hasMessage(id));
 
         return id;
     }

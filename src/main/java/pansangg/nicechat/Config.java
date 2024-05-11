@@ -36,10 +36,15 @@ public class Config {
 
     public TextComponent MSG_DELETE_HINT;
     public TextComponent MSG_EDIT_HINT;
+    public TextComponent MSG_SPOILER_HINT;
     public TextComponent MSG_DELETE_FINISHED;
     public TextComponent MSG_EDIT_FINISHED;
     public TextComponent MSG_RELOAD;
     public TextComponent MSG_RELOAD_FINISHED;
+
+    public boolean SP_ENABLED;
+    public String SP_REPLACING_CHAR;
+    public Pattern SP_REGEX;
 
     private UnrealConfig conf;
     private File regex_file;
@@ -65,7 +70,7 @@ public class Config {
         try {
             for (String line : Files.readAllLines(regex_file.toPath())) {
                 if (!line.trim().isEmpty() && !line.startsWith("#")) {
-                    patterns.add(Pattern.compile(line, Pattern.CASE_INSENSITIVE));
+                    patterns.add(Pattern.compile(line, Pattern.UNICODE_CASE + Pattern.CASE_INSENSITIVE));
                 }
             }
         } catch (IOException e) {
@@ -93,7 +98,7 @@ public class Config {
         }
 
         PF_ENABLED = (boolean) conf.getDot("profanity-filter.enabled");
-        PF_REPLACING_CHAR = (String) conf.getDot("profanity-filter.replacing-char");
+        PF_REPLACING_CHAR = Main.translateHexCodes((String) conf.getDot("profanity-filter.replacing-char"));
         PF_BYPASS_PLAYERS = (List<String>) conf.getDot("profanity-filter.bypass-players");
         PF_REGEX = readRegex();
 
@@ -108,9 +113,14 @@ public class Config {
 
         MSG_DELETE_HINT = fromLegacy((String) conf.getDot("messages.delete-hint"));
         MSG_EDIT_HINT = fromLegacy((String) conf.getDot("messages.edit-hint"));
+        MSG_SPOILER_HINT = fromLegacy((String) conf.getDot("messages.spoiler-hint"));
         MSG_DELETE_FINISHED = fromLegacy((String) conf.getDot("messages.delete-finished"));
         MSG_EDIT_FINISHED = fromLegacy((String) conf.getDot("messages.edit-finished"));
         MSG_RELOAD = fromLegacy((String) conf.getDot("messages.reload"));
         MSG_RELOAD_FINISHED = fromLegacy((String) conf.getDot("messages.reload-finished"));
+
+        SP_ENABLED = (boolean) conf.getDot("spoilers.enabled");
+        SP_REPLACING_CHAR = Main.translateHexCodes((String) conf.getDot("spoilers.replacing-char"));
+        SP_REGEX = Pattern.compile(Main.translateHexCodes((String) conf.getDot("spoilers.regex")));
     }
 }

@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 
 import java.util.Date;
 
-public interface Message {
+public interface Message extends Cloneable {
     Date getCreatedDate();
+    Message clone();
     Component sendMessage(Player receiver);
 }

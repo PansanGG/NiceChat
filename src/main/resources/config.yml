@@ -75,7 +75,17 @@ profanity-filter:
 messages:
   delete-hint: "Delete this message"
   edit-hint: "Edit this message"
+  spoiler-hint: "Click to view spoiler"
   delete-finished: "Message deleted!"
   edit-finished: "Message edited!"
   reload: "Reloading..."
   reload-finished: "Reload finished"
+
+
+# Spoilers
+#     Spoilers like in discord. Click on spoiler and it shows!
+
+spoilers:
+  enabled: true            # Enables this feature
+  replacing-char: "&8█&7"  # Replacing symbols in spoiler with this one
+  regex: "\\|\\|(.*?)\\|\\|"   # Regex that indicates spoiler

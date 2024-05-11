@@ -10,14 +10,17 @@ import org.w3c.dom.Text;
 import java.util.Date;
 
 public class SystemMessage implements Message {
-    private final Date created_date;
-    private final Component text;
-    private final OfflinePlayer receiver;
+    private Date created_date;
+    private Component text;
 
-    public SystemMessage(Component text, OfflinePlayer receiver) {
+    public SystemMessage(Component text) {
         this.text = text;
         this.created_date = new Date();
-        this.receiver = receiver;
+    }
+
+    public SystemMessage(Component text, Date created_dater) {
+        this.text = text;
+        this.created_date = created_dater;
     }
 
     public Component getText() {
@@ -28,8 +31,9 @@ public class SystemMessage implements Message {
         return created_date;
     }
 
-    public OfflinePlayer getReceiver() {
-        return receiver;
+    @Override
+    public Message clone() {
+        return new SystemMessage(text, created_date);
     }
 
     public Component sendMessage(Player receiver) {
