@@ -23,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -406,5 +407,10 @@ public final class Main extends JavaPlugin implements Listener {
     public void onMessage(AsyncPlayerChatEvent e) {
         broadcastMessage(addMessage(e.getPlayer(), e.getMessage()));
         e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onJoin(PlayerJoinEvent e) {
+        chat_messages.remove(e.getPlayer());
     }
 }
