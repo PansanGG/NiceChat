@@ -97,7 +97,7 @@ public class ChatMessage implements Message {
 
                 message_text = Main.setPlaceholders(p, Main.conf.UNIQUE_MESSAGES.getOrDefault(group, Main.conf.DEFAULT_MESSAGE));
                 message_text = (TextComponent) message_text.replaceText((b) -> {
-                    b.matchLiteral("{PLAYER}").replacement(prefix + p.getName() + suffix);
+                    b.matchLiteral("{PLAYER}").replacement(Main.translateHexCodes(prefix + p.getName() + suffix));
                 });
             } else {
                 message_text = Main.setPlaceholders(p, Main.conf.DEFAULT_MESSAGE);

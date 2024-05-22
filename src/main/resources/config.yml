@@ -1,4 +1,4 @@
-# NiceChat v1.0 (by PansanGG_)
+# NiceChat v1.1 (by PansanGG_ & TheMixRay)
 #     Supports PlaceholderAPI, Luckperms and HEX Colors
 #     Formatting is using the ampersand character (&)
 #     WARNING! This plugin requires ProtocolLib
@@ -34,17 +34,32 @@ unique-messages:
   admin: "{DELETE}{EDIT}{PLAYER} &r>> &c{MESSAGE}"
 
 
+# DM messages
+#     It's like /whisper in vanilla
+#     {AUTHOR} is player that sends message to {RECEIVER}
+#     {RECEIVER} is player that gets message from {AUTHOR}
+#     {MESSAGE} is text of message
+
+dm-messages:
+  enabled: true                  # Do you need custom DM-messages command? (Nah, I should use OLD UGLY /whisper command)
+  formats:                       # Formats of DM-messages
+    author: "&7[&1You > &9{RECEIVER}&7] &r{MESSAGE}"                  # That author will see
+    receiver: "&7[&1{AUTHOR} > &9You&7] &r{MESSAGE}"                  # That receiver will see
+
+
 # Action buttons
 #     Adds delete and edit buttons to messages
 #     You need to write {DELETE} and {EDIT} in formats where you need this buttons
+#     +100 respect to MeexReay
 
 action-buttons:
-  enabled: true                  # Do you really need this buttons?
+  enabled: true                  # Nah, do you really need this buttons?
   delete-button: "&c[&4🗑&c]&r "  # Delete button
   edit-button: "&e[&6📝&e]&r "    # Edit button
   delete-button-hidden: "    "   # Delete button when player isn't accessed to delete message
   edit-button-hidden: "    "     # Edit button when player isn't accessed to edit message
   messages-cache: 500            # Message buffer size
+
 
 # Profanity filter
 #     Swear filter, replaces swear words with any symbol (default #)
@@ -58,7 +73,6 @@ profanity-filter:
     - Nickname
     - Nickname2
 
-
   # Punishment
   #     Execute command when some player swears too much
   #     Only one type of punishment, will be corrected in the future
@@ -71,6 +85,7 @@ profanity-filter:
 
 # Messages
 #     The text of all messages and plugin hints that players can see
+#     {PLAYER} is nickname of player
 
 messages:
   delete-hint: "Delete this message"
@@ -80,10 +95,13 @@ messages:
   edit-finished: "Message edited!"
   reload: "Reloading..."
   reload-finished: "Reload finished"
+  join-message: "&e{PLAYER} joined"
+  leave-message: "&e{PLAYER} left"
 
 
 # Spoilers
-#     Spoilers like in discord. Click on spoiler and it shows!
+#     Spoilers like in Discord. Click on spoiler and it shows!
+#     I won't lie, it's so cool!
 
 spoilers:
   enabled: true            # Enables this feature

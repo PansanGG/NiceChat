@@ -17,6 +17,12 @@ import java.util.regex.Pattern;
 public class Config {
     public TextComponent DEFAULT_MESSAGE;
 
+    public TextComponent DM_AUTHOR_FORMAT;
+    public TextComponent DM_RECEIVER_FORMAT;
+
+    public TextComponent JOIN_MESSAGE;
+    public TextComponent LEAVE_MESSAGE;
+
     public boolean UNIQUE_MESSAGES_ENABLED;
     public Map<String, TextComponent> UNIQUE_MESSAGES;
 
@@ -96,6 +102,12 @@ public class Config {
             if (en.getKey().equals("enabled")) continue;
             UNIQUE_MESSAGES.put(en.getKey(), fromLegacy(en.getValue()));
         }
+
+        DM_AUTHOR_FORMAT = fromLegacy((String) conf.getDot("dm-messages.formats.author"));
+        DM_RECEIVER_FORMAT = fromLegacy((String) conf.getDot("dm-messages.formats.receiver"));
+
+        JOIN_MESSAGE = fromLegacy((String) conf.getDot("messages.join-message"));
+        LEAVE_MESSAGE = fromLegacy((String) conf.getDot("messages.leave-message"));
 
         PF_ENABLED = (boolean) conf.getDot("profanity-filter.enabled");
         PF_REPLACING_CHAR = Main.translateHexCodes((String) conf.getDot("profanity-filter.replacing-char"));

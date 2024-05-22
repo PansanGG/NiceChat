@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.luckperms.api.LuckPerms;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -24,6 +25,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -80,6 +82,9 @@ public final class Main extends JavaPlugin implements Listener {
                 Object cont = event.getPacket().getModifier().readSafely(0);
                 boolean overlay = (boolean) event.getPacket().getModifier().readSafely(1);
 
+                getLogger().info("CHAVO CONT: "+cont);
+                getLogger().info("CHAVO OVERLAY: "+overlay);
+
                 if (!overlay) {
                     if (cont instanceof TextComponent comp) {
                         if (conf.AB_ENABLED) {
@@ -110,7 +115,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        // Pep soso etity kolot .,/
+        // soso etity kolotity .,/ cho
     }
 
     public void addMessage(Player player, Message message) {
@@ -207,14 +212,28 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     private void sendMessage(Player player, Component text) {
+        // by ChatGPT
+
         String secret = randomString(16, "1234567890QWERTYUIOPASDFGHJKLZXCVBNM".toCharArray());
         my_secrets.add(secret);
 
+        // Создаем компонент текста из строки secret и объединяем его с исходным компонентом text
+        Component secretComponent = Component.text(secret).append(text);
+
+        // Сериализуем компонент в JSON
+        String json = GsonComponentSerializer.gson().serialize(secretComponent);
+
+        // Конвертируем JSON в WrappedChatComponent
+        WrappedChatComponent wrappedChatComponent = WrappedChatComponent.fromJson(json);
+
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-        packet.getModifier().write(0, secret + JSONComponentSerializer.json().serialize(text));
-        packet.getModifier().write(1, false);
+        packet.getChatComponents().write(0, wrappedChatComponent); // Используем getChatComponents для записи компонента
+        packet.getBooleans().write(1, false);
         proto.sendServerPacket(player, packet);
+
+        // by ChatGPT
     }
+
 
     private String replaceSpoilers(String text) {
         String output = text;
@@ -274,7 +293,7 @@ public final class Main extends JavaPlugin implements Listener {
             for (Message msg : msgs) {
                 if (msg instanceof ChatMessage ch) {
                     if (ch.getId().equals(id)) {
-                        ch.setText(text);
+                        ch.setText(replaceSpoilers(text));
                         found = true;
                     }
                 }
@@ -396,16 +415,6 @@ public final class Main extends JavaPlugin implements Listener {
             }
         }
 
-//        return output;
-
-//        // spoilers
-//        Pattern spoilers = Pattern.compile("||(.*?)||");
-//        Matcher spoilers_matcher = spoilers.matcher(output);
-//
-//        while (spoilers_matcher.find()) {
-//            output = output.replace(spoilers_matcher.group(), "#".repeat(spoilers_matcher.end() - spoilers_matcher.start()));
-//        }
-
         return output;
     }
 
@@ -418,5 +427,16 @@ public final class Main extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent e) {
         chat_messages.remove(e.getPlayer());
+        broadcastMessage(addMessage(e.getPlayer(), Main.conf.JOIN_MESSAGE.replaceText((b) -> {
+                                                        b.matchLiteral("{PLAYER}").replacement(e.getPlayer().getName());
+                                                    }).toString()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLeave(PlayerQuitEvent e) {
+        chat_messages.remove(e.getPlayer());
+        broadcastMessage(addMessage(e.getPlayer(), Main.conf.LEAVE_MESSAGE.replaceText((b) -> {
+            b.matchLiteral("{PLAYER}").replacement(e.getPlayer().getName());
+        }).toString()));
     }
 }
