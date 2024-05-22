@@ -82,9 +82,6 @@ public final class Main extends JavaPlugin implements Listener {
                 Object cont = event.getPacket().getModifier().readSafely(0);
                 boolean overlay = (boolean) event.getPacket().getModifier().readSafely(1);
 
-                getLogger().info("CHAVO CONT: "+cont);
-                getLogger().info("CHAVO OVERLAY: "+overlay);
-
                 if (!overlay) {
                     if (cont instanceof TextComponent comp) {
                         if (conf.AB_ENABLED) {
@@ -217,18 +214,9 @@ public final class Main extends JavaPlugin implements Listener {
         String secret = randomString(16, "1234567890QWERTYUIOPASDFGHJKLZXCVBNM".toCharArray());
         my_secrets.add(secret);
 
-        // Создаем компонент текста из строки secret и объединяем его с исходным компонентом text
-        Component secretComponent = Component.text(secret).append(text);
-
-        // Сериализуем компонент в JSON
-        String json = GsonComponentSerializer.gson().serialize(secretComponent);
-
-        // Конвертируем JSON в WrappedChatComponent
-        WrappedChatComponent wrappedChatComponent = WrappedChatComponent.fromJson(json);
-
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
-        packet.getChatComponents().write(0, wrappedChatComponent); // Используем getChatComponents для записи компонента
-        packet.getBooleans().write(1, false);
+        packet.getModifier().write(0, secret + JSONComponentSerializer.json().serialize(text));
+        packet.getModifier().write(1, false);
         proto.sendServerPacket(player, packet);
 
         // by ChatGPT
